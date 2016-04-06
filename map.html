@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script type="text/javascript" src="js/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="js/lib/bluebird.js"></script>
+    <script type="text/javascript" src="js/lib/underscore.min.js"></script>
+    <script type="text/javascript" src="js/lib/backbone.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/animate.css">
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.16.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.16.0/mapbox-gl.css' rel='stylesheet' />
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v1.0.0/mapbox-gl-geocoder.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v1.0.0/mapbox-gl-geocoder.css' type='text/css' />
+
+    <style>
+        body {
+            margin:0;
+            padding:0;
+            color: #555;
+        }
+
+        #map {
+            position:absolute;
+            top:0;
+            bottom:0;
+            width:100%;
+        }
+
+        #geocoder-container {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            margin-top: 10px;
+            pointer-events: none;
+        }
+
+        #geocoder-container > div {
+            min-width: 75%;
+            margin-left: 12%;
+            pointer-events: auto;
+        }
+
+        .popup-title {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+
+        .popup-content {
+            max-width: 350px;
+        }
+
+        .mp-toast-container {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          right: 50%;
+          z-index: 99999;
+        }
+
+        .mp-toast {
+          width: 400px;
+          margin-left: -200px;
+          margin-right: auto;
+          margin-top: 20px;
+          padding: 10px;
+          border: solid 1px #fefefe;
+          border-radius: 2px;
+          box-shadow: 0 5px 15px rgba(0,0,0,.5);
+          text-align: center;
+          background-color: #fff;
+          font-size: 16px;
+
+          -webkit-animation-duration: .6s !important;
+          animation-duration: .6s !important;
+        }
+
+        .mp-toast-error {
+          color: #E87272;
+          border-color: #E87272;
+        }
+
+        .gmap-link {
+            text-align: right;
+        }
+
+        .gmap-link > a {
+            font-size: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<div id='geocoder-container'></div>
+
+<script src='js/map.js'></script>
+
+</body>
+</html>
