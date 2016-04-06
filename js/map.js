@@ -111,7 +111,7 @@
       mp.geocode(coordinates[0] + ',' + coordinates[1], function (result) {
         for (var i = 0; i < result.features.length; i++) {
           var feature = result.features[i];
-          mp.addTooltip(feature.text, feature.place_name, coordinates);
+          mp.addTooltip(feature.text + ' <small>(My Position)</small>', feature.place_name, coordinates);
 
           break;
         }

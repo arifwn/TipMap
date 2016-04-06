@@ -2,8 +2,10 @@
   "manifest_version": 2,
 
   "name": "TipMap",
-  "description": "Quickly locate and display address from selected text in any webpage.",
-  "version": "0.0.1",
+  "author": "Arif Widi Nugroho",
+  "short_name": "TipMap",
+  "description": "Quickly locate and display location or address from selected text in any webpage.",
+  "version": "0.1.2",
 
   "browser_action": {
     "default_title": "TipMap",
@@ -41,6 +43,7 @@
     "16": "img/icon-16.png",
     "48": "img/icon-48.png",
     "64": "img/icon-64.png",
-    "128": "img/icon-128.png"
+    "128": "img/icon-128.png",
+    "256": "img/icon-256.png"
   }
 } 
