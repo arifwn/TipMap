@@ -3,6 +3,10 @@
   var mp = root.mp = {};
 
   mp.accessToken = 'pk.eyJ1IjoiYXJpZnduIiwiYSI6ImNpbW9uMzgyNTAwZmd2OWt5YzVjdmpvbnYifQ.eXhQUTPiFMZMHSFaXRdv9Q';
+  mp.googleAPIKey = 'AIzaSyCFfWP_S2TXGpFoTVWEG_2imc1Gfg3PG9c';
+  mp.mapZoomLevel = 14;
+  mp.mapCenterPosition = [-73.973007, 40.764226];
+  mp.mapContainerID = 'map';
 
   var toast = mp.toast = function (message, type) {
     if (!type) {
@@ -81,6 +85,79 @@
   };
 
 
+  var googleMapGeocoder = null;
+
+  var googleMapGeocode = mp.googleMapGeocode = function (query, success, error) {
+    
+    $.ajax({
+      url: 'https://maps.googleapis.com/maps/api/geocode/json',
+      data: {
+        address: query,
+        key: mp.googleAPIKey
+      },
+      success: function(response, status, xhr) {
+        if (success) {
+          var data = {
+            features: []
+          };
+          for (var i = 0; i < response.results.length; i++) {
+            var result = response.results[i];
+            data.features.push({
+              text: result.address_components[0].long_name,
+              place_name: result.formatted_address,
+              geometry: {
+                type: 'Point',
+                coordinates: [result.geometry.location.lng, result.geometry.location.lat]
+              }
+            });
+          }
+
+          success(data);
+        }
+      },
+      error: function () {
+        if (error) {
+          error();
+        }
+      }
+    });
+
+  }
+
+  var googleMapReverseGeocode = mp.googleMapReverseGeocode = function (coordinates, success, error) {
+    if (!googleMapGeocoder) {
+      googleMapGeocoder = new google.maps.Geocoder;
+    }
+
+    var latlng = {lat: coordinates[1], lng: coordinates[0]};
+    googleMapGeocoder.geocode({'location': latlng}, function(results, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        var data = {
+          features: []
+        };
+        for (var i = 0; i < results.length; i++) {
+          var result = results[i];
+          data.features.push({
+            text: result.address_components[0].long_name,
+            place_name: result.formatted_address,
+            geometry: {
+              type: 'Point',
+              coordinates: [result.geometry.location.lng, result.geometry.location.lat]
+            }
+          });
+        }
+
+        if (data.features.length > 0 ) {
+          data.features.splice(0, 1);
+        }
+        success(data);
+      } else {
+        error('Geocoder failed due to: ' + status);
+      }
+    });
+  }
+
+
   var getParameterByName = mp.getParameterByName = function (name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
@@ -108,7 +185,7 @@
       var coordinates = [position.coords.longitude, position.coords.latitude];
       mp.map.jumpTo({center: coordinates});
       mp.map.getSource('single-point').setData({ type: 'Point', coordinates: coordinates });
-      mp.geocode(coordinates[0] + ',' + coordinates[1], function (result) {
+      mp.googleMapReverseGeocode(coordinates, function (result) {
         for (var i = 0; i < result.features.length; i++) {
           var feature = result.features[i];
           mp.addTooltip(feature.text + ' <small>(My Position)</small>', feature.place_name, coordinates);
@@ -118,7 +195,6 @@
       });
 
     }, function(positionError) {
-      console.error(positionError);
       mp.removeToast(messageBox);
       mp.toast('Unable to find your position', 'error');
     });
@@ -127,7 +203,7 @@
 
   var locateAddress = mp.locateAddress = function (address) {
     var messageBox = mp.message('Locating <b>' + address + '</b>...');
-    mp.geocode(address, function (result) {
+    mp.googleMapGeocode(address, function (result) {
       mp.removeToast(messageBox);
       for (var i = 0; i < result.features.length; i++) {
         var feature = result.features[i];
@@ -149,15 +225,29 @@
   };
 
 
+  var mapboxReady = false;
+  var googleMapReady = false;
+
+  root.initMap = function () {
+    googleMapReady = true;
+    mp.mapReady();
+  }
+
+  var mapReady = mp.mapReady = function () {
+    if (mapboxReady && googleMapReady) {
+      mp.processDirectCommand();
+    }
+  }
+
   $(function () {
 
     mapboxgl.accessToken = mp.accessToken;
     var map = mp.map = new mapboxgl.Map({
-        container: 'map', // container id
+        container: mp.mapContainerID,
         style: 'mapbox://styles/mapbox/bright-v8', //stylesheet location
         attributionControl: false,
-        center: [-73.973007, 40.764226], // starting position
-        zoom: 10 // starting zoom
+        center: mp.mapCenterPosition,
+        zoom: mp.mapZoomLevel
     });
 
     var geocoder = mp.geocoder = new mapboxgl.Geocoder({
@@ -188,7 +278,8 @@
         }
       });
 
-      mp.processDirectCommand();
+      mapboxReady = true;
+      mp.mapReady();
 
       // Listen for the `geocoder.input` event that is triggered when a user
       // makes a selection and add a marker that matches the result.
