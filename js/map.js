@@ -50,6 +50,17 @@
   }
 
 
+  var getParameterByName = mp.getParameterByName = function (name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i");
+    var results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  };
+
+
   var processDirectCommand = mp.processDirectCommand = function () {
     var initCommand = mp.getParameterByName('command');
     if (initCommand == 'show_current_location') {
@@ -63,6 +74,14 @@
       }
     }
   };
+
+
+  var addTooltip = mp.addTooltip = function (title, content, coordinates) {
+    var tooltip = new mapboxgl.Popup({closeOnClick: false})
+      .setLngLat(coordinates)
+      .setHTML('<h1 class="popup-title">' + title + '</h1><div class="popup-content">' + content + '</div><div class="gmap-link"><a href="https://www.google.com/maps/preview/@' + coordinates[1] + ',' + coordinates[0] + ',12z" target="_blank">open in Google Map</a></div>')
+      .addTo(mp.map);
+  }
 
 
   var geocode = mp.geocode = function (query, success, error) {
@@ -155,25 +174,6 @@
         error('Geocoder failed due to: ' + status);
       }
     });
-  }
-
-
-  var getParameterByName = mp.getParameterByName = function (name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i");
-    var results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-  };
-
-
-  var addTooltip = mp.addTooltip = function (title, content, coordinates) {
-    var tooltip = new mapboxgl.Popup({closeOnClick: false})
-      .setLngLat(coordinates)
-      .setHTML('<h1 class="popup-title">' + title + '</h1><div class="popup-content">' + content + '</div><div class="gmap-link"><a href="https://www.google.com/maps/preview/@' + coordinates[1] + ',' + coordinates[0] + ',12z" target="_blank">open in Google Map</a></div>')
-      .addTo(mp.map);
   }
 
 
